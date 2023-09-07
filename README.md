@@ -1,5 +1,8 @@
 # DS-320_Project
 
+# Goal
+To predict contracts/salaries of current and projected Hockey free agents.
+
 # Needs
 - Raw Data
 - Database
@@ -20,3 +23,5 @@
 - Joins of predictions to stats and salary tables
 - Visualizations of results in Tableau and programming languages
 - Export datasets into SQL and perform queries, make views, and demonstrate techinques discussed in class
+
+# Data Dictionary
