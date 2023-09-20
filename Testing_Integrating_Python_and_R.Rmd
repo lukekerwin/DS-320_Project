@@ -51,4 +51,12 @@ df <- py$df
 
 ```
 
+## Data Cleaning Relating to Player Statistics
+
+```{r}
+players <- read.csv("/Player Data/player_data.csv")
+
+```
+
+
 
