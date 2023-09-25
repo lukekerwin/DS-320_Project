@@ -10,6 +10,9 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r libraries}
+#| warning = FALSE,
+#| message = FALSE
+
 rm(list = ls()) # Clean environment
 library(reticulate)
 library(tidyverse)
@@ -18,19 +21,57 @@ library(tidyverse)
 ## Data Cleaning Relating to Player Statistics
 
 ```{r}
-players <- read.csv("player_data_non_duplicate.csv")
-contract <- read.csv("contracts.csv")
+# Read the data
+#players <- read.csv("player_data_non_duplicate.csv")
+#contract <- read.csv("contracts.csv")
+data <- read.csv("Player and contract.csv")
 
 ```
 
 ```{r}
+# Full join
 test <- full_join(contract, players, by = join_by(Name == Player), keep = TRUE, relationship = "many-to-many")
 ```
 
 ```{r}
-tests <- na.omit(test)
-
-number <- unique(tests$Name)
-
-write.csv(movies,"C:\\Users\\wue77\\Documents\\GitHub\\DS-320_Project\\Combined Contract and Player Data\\tests.csv", row.names = FALSE)
+# Clean the position variable and remove redundant column
+test <- data %>%
+  separate(
+    col = Position,
+    into = c("Position 1", "Position 2"),
+    sep = ", "
+  ) %>%
+  select(-Player, -Age.y, -Tm, -Pos) %>%
+  rename("Age" = "Age.x")
+  
 ```
+
+```{r}
+# Exploration work bench
+number <- unique(data$Contract.Type)
+
+one_way <- data %>%
+  filter(Way.Clause == "1-way")
+
+two_way <- data %>%
+  filter(Way.Clause == "2-way")
+```
+
+```{r}
+# Output file
+write.csv(test,"C:\\Users\\wue77\\Documents\\GitHub\\DS-320_Project\\Combined Contract and Player Data\\tests.csv", row.names = FALSE)
+```
+
+## Data Visualization
+
+```{r}
+contract <- data %>%
+  group_by(Contract.Type) %>%
+  summarize(
+    
+  )
+
+```
+
+
+
