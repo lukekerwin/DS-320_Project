@@ -25,7 +25,7 @@ library(tidyverse)
 #players <- read.csv("player_data_non_duplicate.csv")
 #contract <- read.csv("contracts.csv")
 data <- read.csv("Player and contract.csv")
-
+test <- read.csv("Combined_data_non_null.csv")
 ```
 
 ```{r}
@@ -66,6 +66,49 @@ write.csv(test,"C:\\Users\\wue77\\Documents\\GitHub\\DS-320_Project\\Combined Co
 
 ```{r}
 
+```
+
+## Team Data
+
+n: The number of distinct players that were in the team
+year: The most recent year (Whether a team disband or not)
+
+```{r}
+team <- test %>%
+  group_by(Tm) %>%
+  summarise(
+    n = length(unique(Player)),
+    year = max(Year),
+    GP = sum(GP),
+    G = sum(G),
+    A = sum(A),
+    PTS = sum(PTS),
+    PIM = sum(PIM),
+    PS = sum(PS),
+    EV = sum(EV),
+    PP = sum(PP),
+    SH = sum(SH),
+    GW = sum(GW),
+    EV.1 = sum(EV.1),
+    PP.1 = sum(PP.1),
+    SH.1 = sum(SH.1),
+    S = sum(S),
+    S. = sum(S.),
+    TOI = sum(TOI),
+    ATOI = sum(ATOI),
+    BLK = sum(BLK),
+    HIT = sum(HIT),
+    FOW = sum(FOW),
+    FOL = sum(FOL),
+    FO. = sum(FO.)
+  )
+
+```
+
+```{r}
+# Output file
+write.csv(team,"C:\\Users\\wue77\\Documents\\GitHub\\DS-320_Project\\Combined Contract and Player Data\\team.csv", row.names = FALSE)
+```
 ```
 
 
