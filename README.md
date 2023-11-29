@@ -25,3 +25,24 @@ To predict contracts/salaries of current and projected Hockey free agents.
 - Export datasets into SQL and perform queries, make views, and demonstrate techinques discussed in class
 
 # Data Dictionary
+
+# Project Outline
+- Data Gathering
+    - Player Statistical Data
+    - Player Salary Data
+    - Player Information Data *(optional)*
+
+- Data Cleaning
+    - Done - ish
+
+- Data Storage
+    - SQL Database
+        - Tables
+            - Player Stats
+            - Player Salaries
+            - Player Information *(optional)*
+        - MySQL Workbench
+        - Snowflake *(optional)*
+
+- Data Analysis
+    - Machine Learning Model
