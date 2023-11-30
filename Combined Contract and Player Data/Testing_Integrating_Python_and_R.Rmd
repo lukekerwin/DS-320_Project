@@ -109,7 +109,14 @@ team <- test %>%
 # Output file
 write.csv(team,"C:\\Users\\wue77\\Documents\\GitHub\\DS-320_Project\\Combined Contract and Player Data\\team.csv", row.names = FALSE)
 ```
+
+```{r}
+library(esquisse)
+data <- read.csv("Player and contract.csv")
 ```
 
+```{r}
+esquisse::esquisser(data)
+```
 
 
