@@ -36,13 +36,11 @@ This report not only presents a viable model for predicting NHL player contracts
 
 ## [4. Results](#results-hl)
 
-## [5. Discussion](#discussion-hl)
+## [5. Conclusion](#conclusion-hl)
 
-## [6. Conclusion](#conclusion-hl)
+## [6. References](#references-hl)
 
-## [7. References](#references-hl)
-
-## [8. Appendices](#appendices-hl)
+## [7. Appendices](#appendices-hl)
 
 \newpage
 
@@ -189,13 +187,16 @@ If you look closely you can also see that we decided to standardize all of the s
 
 \newpage
 
-## 5. Model Development
+## 5. ML Model Development
+ 
+After extensive model testing we can to a conclusion that a Support Vector Machine (SVM) is the best suited model for predicting NHL contracts. The model performed the best in both of our testing metrics; r-squared and RMSE. After feature selection and adjusting hyper-parameters, we were able to get the model to predict contracts within roughly $1,000,000. This produced an r-squared value of `0.7275` and the exact RMSE is `1,128,694`. Here are our results of all of our tests:
 
-### Algorithm Selection
+![Modeling Results](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/MLresults.png)
 
-### Feature Selection
+### Integration
 
-### Model Training & Validation
+After we selected our model, we were able to integrate the model directly into our API through an endpoint/route. The user can select which season they want to see predictions for by using `?season=` in the URL of the request. The API then returns real time predictions using the pre-trained model, in seconds. This would come in handy if you needed to access the predictions from other external sources than just a dashboard.
+
 
 \newpage
 
@@ -235,13 +236,14 @@ Arguably the most valuable feature that Tableau has to offer is the ability to c
 
 As you can see above, the MySQL database seemlessly integrates into Tableau and allows for a ton of customization. One of the features we didnt need to implement, but was available, was the Custom SQL. This allows for the creation of new tables using SQL. Think of it almost as a view. You can also draw relationships between the tables inside of Tableau to allow for easy fluidity in the data.
 
-The interactive dashboard is hosted [here](https://public.tableau.com/app/profile/luke.kerwin/viz/DS320/Dashboard1) thanks to the free hosting via Tableau Public.
 
-## 8. Challenges and Limitations
+The interactive dashboard is hosted [here](https://public.tableau.com/app/profile/luke.kerwin/viz/DS320/Dashboard1) thanks to the free hosting via Tableau Public.
 
 \newpage
 
-# Discussion {#discussion-hl}
+## 8. Snowflake Inegration
+
+ERIC HERE
 
 \newpage
 
