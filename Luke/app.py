@@ -60,6 +60,14 @@ class Stat(db.Model):
     def __repr__(self):
         return '<Stat %r>' % self.PLAYER
 
+class Predictions(db.Model):
+    __tablename__ = 'predictions'
+    id = Column(String, primary_key=True)
+    PLAYER = Column(String)
+    CAP_HIT = Column(Float)
+    ERROR = Column(Float)
+    PREDICTION = Column(Float)
+
 # ---- Helper Functions ----
 
 def get_len(row):
@@ -170,36 +178,6 @@ def request_POST(table, data, primary_keys):
     db.session.commit()
     return "Success", 200     
 
-def request_PUT(table, data, primary_keys):
-    pk_args = {key: data[key] for key in data if key in primary_keys}
-
-    query_filters = get_query_filters(pk_args)
-
-    if isinstance(data, str):
-        data = json.loads(data)
-    
-    if not isinstance(data, list):
-        data = [data]
-    
-    for record in data:
-        query_filters = get_query_filters([{key: record[key] for key in record if key in primary_keys}])
-        if query_filters:
-            rows = table.query.filter(text(query_filters)).update(record, synchronize_session=False)
-        
-    db.session.commit()
-    return "Success", 200
-
-def request_DELETE(table, args, primary_keys):
-    pk_args = {key: args[key] for key in args if key in primary_keys}
-
-    query_filters = get_query_filters(pk_args)
-
-    if query_filters:
-        rows = table.query.filter(text(query_filters)).delete(synchronize_session=False)
-        db.session.commit()
-        return "Success", 200
-    else:
-        return "No Parameters Given", 400
 # ---- Endpoints ----
 
 @app.route('/api/')
@@ -244,9 +222,10 @@ def ml_predict():
         stats = get_results(stats)
 
         predictor = ContractPredictor(contracts, stats)
-        predictor.predict()
-
-        return {}, 200
+        prediction = predictor.predict()
+        # write predictions to db
+        request_POST(Predictions, prediction, ['id'])
+        return {'predictions': prediction}, 200
 
 
 
