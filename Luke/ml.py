@@ -47,6 +47,7 @@ class ContractPredictor:
             data.drop(columns=['LENGTH','VALUE'], inplace=True)
             dataset.append(data)
         dataset = pd.concat(dataset)
+
         return dataset
     
     def predict(self):
@@ -86,3 +87,5 @@ class ContractPredictor:
         predictions['ERROR'] = predictions['ERROR'].apply(lambda x: round(x, 3))
 
         return predictions.to_dict('records')
+
+
