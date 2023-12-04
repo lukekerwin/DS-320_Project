@@ -14,15 +14,17 @@ date: "December 5, 2023" # This will automatically insert the current date
 
 # Abstract
 
-This report encapsulates our approach to predicting National Hockey League (NHL) player contract values by utilizing a sophisticated data integration and machine learning pipeline. Our study primarily focuses on integrating and analyzing player performance data and historical contract information, spanning from 2009 to 2022. The data is meticulously sourced from [CapFriendly](https://www.capfriendly.com/) and [Hockey Reference](https://www.hockey-reference.com/) through python web scraping techniques.
+This report encapsulates our approach to predicting National Hockey League (NHL) player contract values by utilizing a sophisticated data integration and machine learning pipeline. Our study primarily focuses on integrating and analyzing player performance data and historical contract information, spanning from 2009 to 2022. The data is meticulously sourced from [CapFriendly](https://www.capfriendly.com/) and [Hockey Reference](https://www.hockey-reference.com/) through Python web scraping techniques.
 
-A key aspect of our methodology involves rigorous data cleaning and preprocessing, where we exclude Entry-Level contracts (ELCs), Restricted Free Agent contracts (RFAs), and Contract Extensions to refine the dataset for more accurate model training. These three types of contracts are restricted in ways that would skew our modeling. This cleaned data is then stored in a locally hosted [MySQL](https://www.mysql.com/) database, with a [Flask](https://flask.palletsprojects.com/en/3.0.x/) and [SQLAlchemy](https://www.sqlalchemy.org/) built API facilitating remote data access, demonstrating potential for online deployment.
+A key aspect of our methodology involves rigorous data cleaning and pre-processing, where we exclude Entry-Level contracts (ELCs), Restricted Free Agent contracts (RFAs), and Contract Extensions to refine the dataset for more accurate model training. These three types of contracts are restricted in ways that would skew our modeling. This cleaned data is then stored in a locally hosted [MySQL](https://www.mysql.com/) database, with a [Flask](https://flask.palletsprojects.com/en/3.0.x/) and SQLAlchemy-built API facilitating remote data access, demonstrating the potential for online deployment.
 
 The cornerstone of our project is the development of a predictive model, derived from the merged dataset of contracts and performance statistics. This model, encapsulated as a Python class, is integrated into our API, enabling real-time predictions as player statistics update.
 
-Further, we have designed an interactive dashboard using [Tableau](https://www.tableau.com/), connected directly to our MySQL database, to visually represent our findings and predictions. While currently limited to manual updates due to resource constraints, the dashboard is designed for potential future automation and easy management, should [Tableau Server](https://www.tableau.com/products/server) be utilized.
+Further, we have designed an interactive dashboard using [Tableau](https://www.tableau.com/), connected directly to our MySQL database, to visually represent our findings and predictions. While currently limited to manual updates due to resource constraints, the dashboard is designed for potential future automation and easy management, should the [Tableau Server](https://www.tableau.com/products/server) be utilized.
 
-This report not only presents a viable model for predicting NHL player contracts but also exemplifies the effective use of data integration, machine learning, and visualization techniques in sports analytics. The implications of this study extend beyond contract predictions, offering insights into data-driven decision-making in professional sports.
+Last but not least, we decided to try replicating the results using Snowflake API and demonstrate cloud-based deployment as our new approach. As a result of the approach, we successfully integrated the player performance data and historical contract information using the Snowflake API, created an interactive dashboard that connects directly to the Snowflake warehouse, and implemented the machine learning models using Snowpark packages and sessions.
+
+This report not only presents a viable model for predicting NHL player contracts but also exemplifies the effective use of data integration, machine learning, and visualization techniques in sports analytics. The implications of this study extend beyond contract predictions, offering insights into data-driven decision-making in professional sports.+++++++++++++++++++++++++++++++++++++++
 
 \newpage
 
@@ -66,24 +68,23 @@ This paper is structured as follows: we begin with a comprehensive methodology s
 
 ### Sources
 
-- **CapFriendly**
-  - Used to gather all historic NHL contract signings from 2012-2022.
-  - Used [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/) to scrape each individual table month by month due to the websites web-scraping prevention tools.
-  - Specific URL [here](https://www.capfriendly.com/signings)
+-   **CapFriendly**
+    -   Used to gather all historic NHL contract signings from 2012-2022.
+    -   Used [BeautifulSoup](https://beautiful-soup-4.readthedocs.io/en/latest/) to scrape each table month by month due to the website's web-scraping prevention tools.
+    -   Specific URL [here](https://www.capfriendly.com/signings)
+-   **Hockey Reference**
+    -   2009-2022 due to needing n-3 previous seasons of statistics to predict year n
+    -   Much easier to scrape than CapFriendly due to the tables being plain HTML tables.
+    -   Benefited from using [Pandas](https://pandas.pydata.org/)' `read_html()` function.
+    -   Specific URL [here](https://www.hockey-reference.com/leagues/NHL_2022_skaters.html)
 
-- **Hockey Reference**
-  - 2009-2022 due to needing n-3 previous seasons of statistics to predict year n
-  - Much easier to scrape than CapFriendly due to the tables being plain HTML tables.
-  - Benefited from using [Pandas](https://pandas.pydata.org/)' `read_html()` function.
-  - Specific URL [here](https://www.hockey-reference.com/leagues/NHL_2022_skaters.html)
-  
-### Webscraping Techniques
+### Web scraping Techniques
 
-During the process of collecting data some insights we gained were profound in how we set up and deployed our data pipeline. For example, normally you can retrieve data by changing the URL parameters. In this case, the web URL was almost a dummy url. We later found an Ajax request call that had similar parameters in it. The next challenge was adapting for the pagination. If we ever called a page that didnt exist, the code would instantly break and we would lose our data. To combat this, we were able to use caching and try-except statements to safegaurd our data collection.
+During the process of collecting data some insights we gained were profound in how we set up and deployed our data pipeline. For example, normally you can retrieve data by changing the URL parameters. In this case, the web URL was almost a dummy URL. We later found an Ajax request call that had similar parameters in it. The next challenge was adapting to the pagination. If we ever called a page that didn't exist, the code would instantly break and we would lose our data. To combat this, we were able to use caching and try-except statements to safeguard our data collection.
 
-With the Hockey Reference data source since the statistics were not paginated, we didnt have to iterate from month to month. We could get a whole years data in one request call. All we had to do was change the year in the URL; https://www.hockey-reference.com/leagues/NHL_2022_skaters.html. One unique thing about this dataset was that the HTML column headers were built into the actual dataset. We were able to handle this in the Data Cleaning and Preprocessing stage.
+With the Hockey Reference data source since the statistics were not paginated, we didn't have to iterate from month to month. We could get a whole year's data in one request call. All we had to do was change the year in the URL; https://www.hockey-reference.com/leagues/NHL_2022_skaters.html. One unique thing about this dataset was that the HTML column headers were built into the actual dataset. We were able to handle this in the Data Cleaning and Preprocessing stage.
 
-Python code used to webscrape can be found [here](https://github.com/lukekerwin/DS-320_Project/blob/main/Luke/data.py).
+Python code used to web scrape can be found [here](https://github.com/lukekerwin/DS-320_Project/blob/main/Luke/data.py).
 
 \newpage
 
@@ -91,37 +92,37 @@ Python code used to webscrape can be found [here](https://github.com/lukekerwin/
 
 ### Contract Data
 
-![Contract Raw Data](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/ContractRawData.png)
+![Contract Raw Data](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/ContractRawData.png)
 
 Above is what the contract data looked like as soon as we scraped it from CapFriendly. Some key features that we need to clean and preprocess are:
 
-1. Handling `PLAYER.1` column
-2. Standardizing the `DATE` to a more accessible data point
-3. Filter `TYPE` to `Stnd (UFA)` to get the true contracts
-4. Replacing `EXTENSION` values with binary (0,1)
-5. Standardizing `VALUE` and `CAP HIT` to integers from strings
-6. Adding an `id` column for easy database storage
+1.  Handling `PLAYER.1` column
+2.  Standardizing the `DATE` to a more accessible data point
+3.  Filter `TYPE` to `Stnd (UFA)` to get the true contracts
+4.  Replacing `EXTENSION` values with binary (0,1)
+5.  Standardizing `VALUE` and `CAP HIT` to integers from strings
+6.  Adding an `ID` column for easy database storage
 
-After implemeting these changes our final contract dataset looks like this:
+After implementing these changes our final contract dataset looks like this:
 
-![Contract Cleaned Data](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/ContractCleanedData.png)
+![Contract Cleaned Data](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/ContractCleanedData.png)
 
 \newpage
 
 ### Statistics Data
 
-![Statistics Raw Data](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/StatisticsRawData.png)
+![Statistics Raw Data](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/StatisticsRawData.png)
 
-As you can see from above, there are some key changes we will need to make inorder to make our data friendly not only for machine learning but also for storing in our SQL database. Heres what we did:
+As you can see from above, there are some key changes we will need to make to make our data friendly not only for machine learning but also for storing in our SQL database. Here is what we did:
 
-1. Remove `Rk` as it has no value to us
-2. Use `TOT` (Team) rows for players who played on multiple teams in one season (example: Craig Adams above)
-3. Fix duplicate column names such as `EV`, `PP`, `SH`
-4. Fix column names with % in them as they are not MySQL compliant names
-5. Add an `id` column
-6. Remove goalie statistics
+1.  Remove `Rk` as it has no value to us
+2.  Use `TOT` (Team) rows for players who played on multiple teams in one season (example: Craig Adams above)
+3.  Fix duplicate column names such as `EV`, `PP`, `SH`
+4.  Fix column names with % in them as they are not MySQL-compliant names
+5.  Add an `ID` column
+6.  Remove goalie statistics
 
-![Statistics Cleaned Data](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/StatisticsCleanedData.png)
+![Statistics Cleaned Data](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/StatisticsCleanedData.png)
 
 Python code used to clean and preprocess the data can be found [here](https://github.com/lukekerwin/DS-320_Project/blob/main/Luke/data.py).
 
@@ -133,12 +134,13 @@ Now we need to store the data.
 
 ## 3. Database Setup and Management
 
-Due to familiarity and accessibility of documentation, we chose to go with a MySQL database. It's a very well know DB and has a ton of support for some of the features we wanted to add later on.
+Due to familiarity and accessibility of documentation, we chose to go with a MySQL database. It's a very well-known DB and has a ton of support for some of the features we wanted to add later on.
 
 ### Setup
 
-Setup was fairly easy thanks to the python packages; Flask and sqlalchemy. These packages allowed us to essentially create the DB base from our pandas dataframes. Later we were able to go in and customize the relationships such as primary keys and foreign keys. Heres the two table schemas:
+Setup was fairly easy thanks to the Python packages; Flask and sqlalchemy. These packages allowed us to essentially create the DB base from our panda's data frames. Later we were able to go in and customize the relationships such as primary keys and foreign keys. Here are the two table schemas:
 
+```{=tex}
 \begin{figure}[h]
   \centering
   \begin{minipage}{0.45\textwidth}
@@ -154,49 +156,48 @@ Setup was fairly easy thanks to the python packages; Flask and sqlalchemy. These
     \label{fig:image2}
   \end{minipage}
 \end{figure}
-
+```
 \newpage
 
 ### Hosting Locally
 
-Something that is really cool, that we didnt discover until working on this project is that MySQL integrates really well with Mac OSX which happend to be the operating system we hosted it on. Here you can manage the local instance at ease.
+Something cool, that we didn't discover until working on this project is that MySQL integrates well with Mac OSX which happened to be the operating system we hosted it on. Here you can manage the local instance with ease.
 
-![Mac OSX MySQLConfig](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/MySQLConfig.png)
+![Mac OSX MySQLConfig](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/MySQLConfig.png)
 
-If this project ever needed to be hosted online, MySQL allows for you to export the DB config which allows for an easy and seemless migration from local to online.
+If this project ever needed to be hosted online, MySQL allows you to export the DB config which allows for an easy and seamless migration from local to online.
 
 ## 4. Data Integration
 
 ### Merging the Data
 
-Due to the time period restraint we set on the statistics data to predict the contract value, the merging of the two datasets isn't as easy as originally thought. For example. Say a player has played 10 seasons from 2005-2015. If we want to predict his 2012 contract, we need to filter the data down to 2009, 2010, and 2011 seasons. It might not seem like a big issue, but we need to do that step for each individual player we are predicting for as well.
+Due to the time restraint we set on the statistics data to predict the contract value, the merging of the two datasets isn't as easy as originally thought. For example. Say a player has played 10 seasons from 2005-2015. If we want to predict his 2012 contract, we need to filter the data down to the 2009, 2010, and 2011 seasons. It might not seem like a big issue, but we need to do that step for each player we are predicting as well.
 
-To overcome this challenge we utilize the Pandas package in python to do a selective group-by so that we are only using the data from our restricted timeline and not the entire data set. We also want to standardize the `POS` column into positional groups. This will aide the predictive model in being able to separate centers, wingers and defensemen from each other. We achieve this by using a simple if-then function in python.
+To overcome this challenge we utilize the Pandas package in Python to do a selective group-by so that we are only using the data from our restricted timeline and not the entire data set. We also want to standardize the `POS` column into positional groups. This will aid the predictive model in being able to separate centers, wingers, and defensemen from each other. We achieve this by using a simple if-then function in Python.
 
 The code used to merge the data can be found [here](https://github.com/lukekerwin/DS-320_Project/blob/main/Luke/ml.py)
 
 ### Handling Heterogeneous Data
 
-At first we were worried that we were going to run into issues with heterogenous data, but as we worked though cleaning and merging the data, we actually ended up with homogenous data. That being said, in the future there may come a time where two people have the same name or they play the same position in the same year. A new way to handle the heterogenous data will need to be implemented. We would reccommend either manually assigning a unqiue identifier for each individual player or getting access to data that has personal information that could be used to distinguish one from another.
+At first, we were worried that we were going to run into issues with heterogenous data, but as we worked through cleaning and merging the data, we ended up with homogenous data. That being said, in the future, there may come a time when two people have the same name or they play the same position in the same year. A new way to handle the heterogeneous data will need to be implemented. We would recommend either manually assigning a unique identifier for each player or getting access to data that has personal information that could be used to distinguish one from another.
 
-After completing all of the steps necessary to merge the `contract` and `statistics` tables we are left with a dataset that looks like:
+After completing all of the steps necessary to merge the `contract` and `statistics` tables we are left with a dataset that looks like this:
 
-![Merged Dataset](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/MergedDataset.png)
+![Merged Dataset](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/MergedDataset.png)
 
 If you look closely you can also see that we decided to standardize all of the statistics columns to a per-game basis so that players who played more games wouldn't be seen as more valuable than those who played less.
 
 \newpage
 
 ## 5. ML Model Development
- 
-After extensive model testing we can to a conclusion that a Support Vector Machine (SVM) is the best suited model for predicting NHL contracts. The model performed the best in both of our testing metrics; r-squared and RMSE. After feature selection and adjusting hyper-parameters, we were able to get the model to predict contracts within roughly $1,000,000. This produced an r-squared value of `0.7275` and the exact RMSE is `1,128,694`. Here are our results of all of our tests:
 
-![Modeling Results](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/MLresults.png)
+After extensive model testing, we concluded that a Support Vector Machine (SVM) is the best-suited model for predicting NHL contracts. The model performed the best in both of our testing metrics; r-squared and RMSE. After feature selection and adjusting hyper-parameters, we were able to get the model to predict contracts within roughly \$1,000,000. This produced an r-squared value of `0.7275` and the exact RMSE is `1,128,694`. Here are the results of all of our tests:
+
+![Modeling Results](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/MLresults.png)
 
 ### Integration
 
-After we selected our model, we were able to integrate the model directly into our API through an endpoint/route. The user can select which season they want to see predictions for by using `?season=` in the URL of the request. The API then returns real time predictions using the pre-trained model, in seconds. This would come in handy if you needed to access the predictions from other external sources than just a dashboard.
-
+After we selected our model, we were able to integrate the model directly into our API through an endpoint/route. The user can select which season they want to see predictions for by using `?season=` in the URL of the request. The API then returns real-time predictions using the pre-trained model, in seconds. This would come in handy if you needed to access the predictions from other external sources than just a dashboard.
 
 \newpage
 
@@ -204,13 +205,13 @@ After we selected our model, we were able to integrate the model directly into o
 
 ### Why?
 
-At first we did not have any plans for an API to be built into our pipeline. However we kept running into an issue as we were working together as a team; getting the most recent data from group member to group member. Whenever someone would make a change to the data cleaning and preprocessing, we needed to move that data to everyone else who was working on other sections that used the same data.
+At first, we did not have any plans for an API to be built into our pipeline. However, we kept running into an issue as we were working together as a team; getting the most recent data from group member to group member. Whenever someone would make a change to the data cleaning and pre-processing, we needed to move that data to everyone else who was working on other sections that used the same data.
 
-At first we would download the data to CSVs and send them via email. At this moment we realized we needed a much better way to solve our problem. After some research we concluded that an API would be best, as it could connect directly to our main datasource (MySQL DB) and we wouldnt have to worry about conflicts due to changing CSVs.
+At first, we would download the data to CSVs and send them via email. At this moment we realized we needed a much better way to solve our problem. After some research, we concluded that an API would be best, as it could connect directly to our main data source (MySQL DB) and we would not have to worry about conflicts due to changing CSVs.
 
-The orginal intent was to just have two routes/endpoints; one for the contract data and one for the statistics data. However after reading the Flask documentation, we discovered there was so much more that we could do. Not only could we send and recieve data, but we could also connect our machine learning algorithm to an endpoint to allow for quick real-time predictions. While it may be overkill for the scale of this project, it certainly is an advancedment in data integration that would apply in the real world.
+The original intent was to just have two routes/endpoints; one for the contract data and one for the statistics data. However, after reading the Flask documentation, we discovered there was so much more that we could do. Not only could we send and receive data, but we could also connect our machine-learning algorithm to an endpoint to allow for quick real-time predictions. While it may be overkill for the scale of this project, it certainly is an advancement in data integration that would apply in the real world.
 
-Due to hosting expenses, we aren't able to host the API publicly, but [here](https://www.youtube.com) is a video that quickly demonstrates its capabilites.
+Due to hosting expenses, we aren't able to host the API publicly, but [here](https://www.youtube.com) is a video that quickly demonstrates its capabilities.
 
 \newpage
 
@@ -218,32 +219,53 @@ Due to hosting expenses, we aren't able to host the API publicly, but [here](htt
 
 ### Tool Choice
 
-There were a lot of options to pick from when selecting a visualization tool. However, we ended up going with Tableau as not only was it familiar to our group, but also had the best configuration for integrating with out data. Some of the key features were that it allowed us to connect our MySQL database as a direct data source which allowed for easy updating of data. Tableau also offers free hosting of dashboards on its Tableau Public service. These two key factors made it an easy choice over other options such as; matplotlib, ggplot and others.
+There were a lot of options to pick from when selecting a visualization tool. However, we ended up going with Tableau as not only was it familiar to our group, but also had the best configuration for integrating without data. One of the key features was that it allowed us to connect our MySQL database as a direct data source which allowed for easy updating of data. Tableau also offers free hosting of dashboards on its Tableau Public service. These two key factors made it an easy choice over other options such as; matplotlib, ggplot, and others.
 
 ### Dashboard Design
 
-![Dashboard](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/Dashboard.png)
+![Dashboard](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/Dashboard.png)
 
-Creating the dashboard was a unique process. We wanted to capture the insights gained from not only our machine learning algorithm but also the effectiveness of our pipeline. The left half of the dashboard has each individual prediction with features that give insight into how accurate our prediction was. The top right plot displays each individual prediction but allows for direct comparison with other similar predictions. Finally in the bottom right, we have the predictions broken down by team. This allows for quick analysis on what teams might have had the best contract signings versus the worst. The dashboard is also interactive. The user can select which season's data they would like to view as well as the age of the players.
+Creating the dashboard was a unique process. We wanted to capture the insights gained from not only our machine learning algorithm but also the effectiveness of our pipeline. The left half of the dashboard has each prediction with features that give insight into how accurate our prediction was. The top right plot displays each prediction but allows for direct comparison with other similar predictions. Finally, in the bottom right, we have the predictions broken down by team. This allows for quick analysis of what teams might have had the best contract signings versus the worst. The dashboard is also interactive. The user can select which season's data they would like to view as well as the age of the players.
 
 \newpage
 
 ### Database Connection
 
-Arguably the most valuable feature that Tableau has to offer is the ability to connect directly to our MySQL database. All we had to do was download a connector plugin and login to the local MySQL server. 
+Arguably the most valuable feature that Tableau has to offer is the ability to connect directly to our MySQL database. All we had to do was download a connector plugin and log in to the local MySQL server.
 
-![MySQL / Tableau Integration](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/TableauData.png)
+![MySQL / Tableau Integration](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS%20320/DS-320_Project/TableauData.png)
 
-As you can see above, the MySQL database seemlessly integrates into Tableau and allows for a ton of customization. One of the features we didnt need to implement, but was available, was the Custom SQL. This allows for the creation of new tables using SQL. Think of it almost as a view. You can also draw relationships between the tables inside of Tableau to allow for easy fluidity in the data.
-
+As you can see above, the MySQL database seamlessly integrates into Tableau and allows for a ton of customization. One of the features we didn't need to implement but was available was the Custom SQL. This allows for the creation of new tables using SQL. Think of it almost as a view. You can also draw relationships between the tables inside Tableau to allow for easy fluidity in the data.
 
 The interactive dashboard is hosted [here](https://public.tableau.com/app/profile/luke.kerwin/viz/DS320/Dashboard1) thanks to the free hosting via Tableau Public.
 
 \newpage
 
-## 8. Snowflake Inegration
+## 8. Extra: Cloud-based Data Warehousing Exploration
 
-ERIC HERE
+### Integration in Snowflake
+
+Integration in Snowflake is very straightforward as it's also based on SQL queries. The level of difficulty of integration is simpler than what we used in the Jupyter Notebook given that Snowflake allows importing CSV files so we don't have to create the schema ourselves. In addition, it's very easy to create new tables in Snowflake as there's the create table keyword can be directly used on top of a SQL query.
+
+### Data Storage in Snowflake
+
+The database schema is stored in a Snowflake virtual warehouse that ultimately supports the execution of SQL queries and allows external notebook files to access the schema in Snowflake sessions using Snowpark packages. Aside from the local notebook file, there are also collaborative companies like Hex that provides online notebook and can directly access the schema by establishing a connection.
+
+### Snowflake Dashboard
+
+Snowflake provides the user easy access to create a simple dashboard using SQL queries or Python queries. The dashboard that we created for our data supports an analysis of the relationship between player position and a variety of other variables presented in different data visualizations.
+
+\[snowflake dashboard.jpg\]
+
+### Machine Learning in Snowflake
+
+Needs to be filled
+
+### Disadvantage of Snowflake
+
+The biggest disadvantage of using Snowflake is that it can be costly, the cost of storing our data is about \$3.00 per day. Other than the cost, the only disadvantage is the low customization capability in Snowflake API. However, this could be due to our limited experience with Snowflake.
+
+\[usage.jpg\]
 
 \newpage
 
@@ -256,3 +278,5 @@ ERIC HERE
 \newpage
 
 # Appendices {#appendices-hl}
+
+Github Repo - https://github.com/lukekerwin/DS-320_Project
