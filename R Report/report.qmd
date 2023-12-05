@@ -157,6 +157,7 @@ Setup was fairly easy thanks to the Python packages; Flask and sqlalchemy. These
   \end{minipage}
 \end{figure}
 ```
+
 \newpage
 
 ### Hosting Locally
@@ -255,28 +256,40 @@ The database schema is stored in a Snowflake virtual warehouse that ultimately s
 
 Snowflake provides the user easy access to create a simple dashboard using SQL queries or Python queries. The dashboard that we created for our data supports an analysis of the relationship between player position and a variety of other variables presented in different data visualizations.
 
-\[snowflake dashboard.jpg\]
+![Snowflake Dashboard](/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/sdashboard.png)
 
 ### Machine Learning in Snowflake
 
-Needs to be filled
+Adding machine learning to our Snowflake enviornment was actually rather easy. Snowflake has "worksheets" which are really just notebooks. Here we were able to use the exact same code from our previous ML model and run it on the data in our Snowflake DB. Heres a view of what the worksheets look like:
 
 ### Disadvantage of Snowflake
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=4.5in]{/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/worksheet.png}
+  \caption{Snowflake Worksheet}
+  \label{fig:image2}
+\end{figure}
+
 The biggest disadvantage of using Snowflake is that it can be costly, the cost of storing our data is about \$3.00 per day. Other than the cost, the only disadvantage is the low customization capability in Snowflake API. However, this could be due to our limited experience with Snowflake.
 
-\[usage.jpg\]
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=4.5in]{/Users/lukekerwin/Library/CloudStorage/OneDrive-ThePennsylvaniaStateUniversity/School/DS 320/DS-320_Project/Usage.png}
+  \caption{Snowflake Usage}
+  \label{fig:image2}
+\end{figure}
 
 \newpage
 
 # Conclusion {#conclusion-hl}
 
+# Contribution {#contribution-hl}
+
 \newpage
 
 # References {#references-hl}
 
-\newpage
-
 # Appendices {#appendices-hl}
 
-Github Repo - https://github.com/lukekerwin/DS-320_Project
+[Github Repo](https://github.com/lukekerwin/DS-320_Project)
